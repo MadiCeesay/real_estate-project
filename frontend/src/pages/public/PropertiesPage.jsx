@@ -30,7 +30,7 @@ export default function PropertiesPage() {
 
   // Sync state with URL params
   const [filters, setFilters] = useState({
-    search: searchParams.get('search') || '',
+    search: searchParams.get('search') || searchParams.get('city') || '',
     type: searchParams.get('type') || '',
     category: searchParams.get('category') || '',
     minPrice: searchParams.get('minPrice') || '',
@@ -39,19 +39,41 @@ export default function PropertiesPage() {
   })
 
   useEffect(() => {
+    setFilters({
+      search: searchParams.get('search') || searchParams.get('city') || '',
+      type: searchParams.get('type') || '',
+      category: searchParams.get('category') || '',
+      minPrice: searchParams.get('minPrice') || '',
+      maxPrice: searchParams.get('maxPrice') || '',
+      sort: searchParams.get('sort') || 'newest',
+    })
+  }, [searchParams])
+
+  useEffect(() => {
     let active = true
     setLoading(true)
 
     const params = cleanParams(Object.fromEntries([...searchParams]))
 
-    propertyService.getAll(params)
+    const query = { page: 1, ...params }
+    if (query.city && !query.search) {
+      query.search = query.city
+    }
+
+    propertyService.getAll(query)
       .then(({ data }) => {
         if (active) {
-          setProperties(data.data)
-          setTotal(data.total || data.data.length)
+          const list = Array.isArray(data?.data) ? data.data : []
+          setProperties(list)
+          setTotal(data.pagination?.total ?? list.length)
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        if (active) {
+          setProperties([])
+          setTotal(0)
+        }
+      })
       .finally(() => {
         if (active) setLoading(false)
       })

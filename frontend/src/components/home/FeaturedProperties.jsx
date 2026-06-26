@@ -1,72 +1,55 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { FiArrowRight } from 'react-icons/fi'
+import { FiArrowRight, FiAlertCircle, FiRefreshCw } from 'react-icons/fi'
 import { propertyService } from '../../services/property.service'
+import { MOCK_PROPERTIES } from '../../data/mockProperties'
 import PropertyGrid from '../properties/PropertyGrid'
+import ErrorBoundary from '../common/ErrorBoundary'
 
-const fallbackProperties = [
-  {
-    _id: 'sample-1',
-    title: 'Jambur city apartment',
-    description: 'Bright modern apartment with skyline views and a premium location.',
-    price: 40000,
-    type: 'sale',
-    category: 'apartment',
-    bedrooms: 4,
-    bathrooms: 3,
-    area: 90,
-    address: { city: 'Banjul', state: 'Jambur' },
-    images: [{ url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxhPmeYfhgw9rnmfA7Sv95cqOGxTTrHsFJo1TbajEPhg&s=10', publicId: 'sample-1' }],
-    isFeatured: true,
-  },
-  {
-    _id: 'sample-2',
-    title: 'Elegant suburban house',
-    description: 'Spacious family home with garden, garage, and calm neighborhood charm.',
-    price: 42000,
-    type: 'sale',
-    category: 'house',
-    bedrooms: 4,
-    bathrooms: 3,
-    area: 210,
-    address: { city: 'Banjul', state: 'Salagi' },
-    images: [{ url: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80', publicId: 'sample-2' }],
-    isFeatured: true,
-  },
-  {
-    _id: 'sample-3',
-    title: 'Premium downtown studio',
-    description: 'Compact studio with premium finishes, perfect for city living.',
-    price: 1900,
-    type: 'rent',
-    category: 'studio',
-    bedrooms: 1,
-    bathrooms: 1,
-    area: 45,
-    address: { city: 'Bijilo', state: 'BJ' },
-    images: [{ url: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80', publicId: 'sample-3' }],
-    isFeatured: true,
-  },
-]
+const normalizePropertyList = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.properties)) return payload.properties
+  return []
+}
 
 export default function FeaturedProperties() {
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [usingFallback, setUsingFallback] = useState(false)
+
+  const loadFeatured = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data } = await propertyService.getAll({
+        page: 1,
+        limit: 6,
+        sort: 'most_viewed',
+      })
+
+      const fetched = normalizePropertyList(data?.data)
+
+      if (fetched.length > 0) {
+        setProperties(fetched)
+        setUsingFallback(false)
+      } else {
+        setProperties(MOCK_PROPERTIES)
+        setUsingFallback(true)
+      }
+    } catch (err) {
+      setProperties(MOCK_PROPERTIES)
+      setUsingFallback(true)
+      setError(err?.message || 'Unable to load featured properties right now.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    let active = true
-    propertyService.getAll({ limit: 6, sort: 'most_viewed', isFeatured: true })
-      .then(({ data }) => {
-        if (!active) return
-        const fetched = data?.data || []
-        setProperties(fetched.length ? fetched : fallbackProperties)
-      })
-      .catch(() => {
-        if (active) setProperties(fallbackProperties)
-      })
-      .finally(() => { if (active) setLoading(false) })
-    return () => { active = false }
-  }, [])
+    loadFeatured()
+  }, [loadFeatured])
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -82,7 +65,37 @@ export default function FeaturedProperties() {
         </Link>
       </div>
 
-      <PropertyGrid properties={properties} loading={loading} skeletonCount={6} />
+      {error && usingFallback && (
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-4 py-3">
+          <div className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-200">
+            <FiAlertCircle className="shrink-0 mt-0.5" size={16} />
+            <span>{error} Showing sample listings until the server is available.</span>
+          </div>
+          <button
+            type="button"
+            onClick={loadFeatured}
+            className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-900 dark:text-amber-100 hover:underline shrink-0"
+          >
+            <FiRefreshCw size={14} />
+            Retry
+          </button>
+        </div>
+      )}
+
+      {usingFallback && !error && !loading && (
+        <p className="mb-6 text-sm text-ink-500 dark:text-ink-400">
+          Sample listings — connect the backend to show live featured properties.
+        </p>
+      )}
+
+      <ErrorBoundary resetKey={properties.map((p) => p._id).join(',')}>
+        <PropertyGrid
+          properties={properties}
+          loading={loading}
+          skeletonCount={6}
+          emptyMessage="Featured listings will appear here once properties are available."
+        />
+      </ErrorBoundary>
 
       <div className="sm:hidden mt-8 text-center">
         <Link to="/properties" className="btn-secondary">View all properties</Link>

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { FiMapPin, FiCalendar, FiHeart, FiShare2, FiCheck, FiHome, FiUser } from 'react-icons/fi'
 import { BiBed, BiBath, BiArea } from 'react-icons/bi'
 import { propertyService } from '../../services/property.service'
+import { isDemoPropertyId } from '../../data/mockProperties'
 import { useAuth } from '../../hooks/useAuth'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
 import toast from 'react-hot-toast'
@@ -15,8 +16,27 @@ export default function PropertyDetailPage() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    if (!id) {
+      setError('Invalid property link.')
+      setLoading(false)
+      return
+    }
+
+    if (isDemoPropertyId(id)) {
+      setError('This is a sample listing. Browse live properties to view full details.')
+      setLoading(false)
+      return
+    }
+
     propertyService.getById(id)
-      .then(({ data }) => setProperty(data.data))
+      .then(({ data }) => {
+        const resolved = data?.data?.property ?? data?.data
+        if (!resolved?.title) {
+          setError('Property details could not be loaded.')
+          return
+        }
+        setProperty(resolved)
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [id])
@@ -24,9 +44,11 @@ export default function PropertyDetailPage() {
   if (loading) return <div className="pt-32 flex justify-center"><LoadingSpinner size="lg" /></div>
   if (error) return (
     <div className="pt-32 max-w-7xl mx-auto px-4 text-center">
-      <h2 className="text-2xl font-bold text-ink-900 dark:text-white mb-2">Oops!</h2>
-      <p className="text-ink-500 mb-6">{error}</p>
-      <Link to="/properties" className="btn-primary">Back to listings</Link>
+      <h2 className="text-2xl font-bold text-ink-900 dark:text-white mb-2">
+        {isDemoPropertyId(id) ? 'Sample listing' : 'Oops!'}
+      </h2>
+      <p className="text-ink-500 dark:text-ink-400 mb-6 max-w-md mx-auto">{error}</p>
+      <Link to="/properties" className="btn-primary">Browse all listings</Link>
     </div>
   )
   if (!property) return null

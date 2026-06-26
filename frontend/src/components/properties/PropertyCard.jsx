@@ -4,10 +4,13 @@ import { BiBed, BiBath, BiArea } from 'react-icons/bi'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAuth } from '../../hooks/useAuth'
 import { toggleFavorite } from '../../redux/slices/favoritesSlice'
+import { isDemoPropertyId } from '../../data/mockProperties'
 import toast from 'react-hot-toast'
 
 const formatPrice = (price, type) => {
-  const formatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price)
+  const safePrice = Number(price)
+  if (!Number.isFinite(safePrice)) return 'Price on request'
+  const formatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(safePrice)
   return type === 'rent' ? `${formatted}/mo` : formatted
 }
 
@@ -16,10 +19,15 @@ export default function PropertyCard({ property }) {
   const { isAuthenticated } = useAuth()
   const favoriteIds = useSelector((state) => state.favorites.ids)
   const isFavorited = favoriteIds.includes(property._id)
+  const isDemo = property.isDemo || isDemoPropertyId(property._id)
 
   const handleFavoriteClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    if (isDemo) {
+      toast.error('Sign in and browse live listings to save properties')
+      return
+    }
     if (!isAuthenticated) {
       toast.error('Sign in to save properties')
       return
@@ -30,8 +38,12 @@ export default function PropertyCard({ property }) {
   const coverImage = property.images?.[0]?.url ||
     'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=60'
 
+  const detailPath = isDemo
+    ? `/properties?city=${encodeURIComponent(property.address?.city || '')}`
+    : `/properties/${property._id}`
+
   return (
-    <Link to={`/properties/${property._id}`} className="card group overflow-hidden block">
+    <Link to={detailPath} className="card group overflow-hidden block">
       <div className="relative h-52 overflow-hidden">
         <img
           src={coverImage}
@@ -75,13 +87,19 @@ export default function PropertyCard({ property }) {
 
         <p className="flex items-center gap-1 text-xs text-ink-500 dark:text-ink-400 mb-3">
           <FiMapPin size={12} />
-          {property.address?.city}, {property.address?.state}
+          {[property.address?.city, property.address?.state].filter(Boolean).join(', ') || 'Location TBD'}
         </p>
 
         <div className="flex items-center gap-4 text-xs text-ink-600 dark:text-ink-300 mb-3">
-          <span className="flex items-center gap-1"><BiBed size={15} />{property.bedrooms} bd</span>
-          <span className="flex items-center gap-1"><BiBath size={15} />{property.bathrooms} ba</span>
-          <span className="flex items-center gap-1"><BiArea size={15} />{property.area} m²</span>
+          {property.bedrooms != null && (
+            <span className="flex items-center gap-1"><BiBed size={15} />{property.bedrooms} bd</span>
+          )}
+          {property.bathrooms != null && (
+            <span className="flex items-center gap-1"><BiBath size={15} />{property.bathrooms} ba</span>
+          )}
+          {property.area != null && (
+            <span className="flex items-center gap-1"><BiArea size={15} />{property.area} m²</span>
+          )}
         </div>
 
         <div className="flex items-center justify-between pt-3 border-t border-ink-100 dark:border-ink-700">
