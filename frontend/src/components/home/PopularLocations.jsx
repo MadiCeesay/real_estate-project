@@ -4,28 +4,33 @@ const LOCATIONS = [
   {
     city: 'Banjul',
     count: '48',
-    img: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800&q=80',
+    img: 'https://gambiapropertyshop.com/wp-content/uploads/2020/04/Houses-For-Rent.jpg',
   },
   {
     city: 'Serrekunda',
     count: '62',
-    img: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=800&q=80',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiHO7-GKHBpDZFiRdPUFmo_Ryz1hDlZi9LUSW2JTACWg&s=10',
   },
   {
     city: 'Bakau',
     count: '35',
-    img: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMcRK1K1UCOTgePTx_3DH5WTjjMAJaWlb7ynyIg6OHwJ5pvZOpDHaEjd0&s=10',
   },
   {
     city: 'Kololi',
     count: '28',
-    img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8O3YdtTk8puPY9jWx81zslDySO4BG1Ol4OAT3DVgVAQ&s=10',
   },
   {
     city: 'Brusubi',
     count: '41',
-    img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxhPmeYfhgw9rnmfA7Sv95cqOGxTTrHsFJo1TbajEPhg&s=10',
   },
+  {
+    city: 'Salagi',
+    count: '19',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoHR6lbnpMmgxTcg3rJNKMi8XoaBUOSxiHRrmbrGR6kQ&s=10'
+  }
 ]
 
 export default function PopularLocations() {
