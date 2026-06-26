@@ -10,7 +10,8 @@ export const loginUser = createAsyncThunk(
       const { data } = await authService.login(credentials)
       return data.data
     } catch (err) {
-      return rejectWithValue(err.message)
+      const message = err?.response?.data?.message || err?.message || 'Login failed. Please try again.'
+      return rejectWithValue(message)
     }
   }
 )
@@ -22,7 +23,8 @@ export const registerUser = createAsyncThunk(
       const { data } = await authService.register(payload)
       return data.data
     } catch (err) {
-      return rejectWithValue(err.message)
+      const message = err?.response?.data?.message || err?.message || 'Registration failed. Please try again.'
+      return rejectWithValue(message)
     }
   }
 )
