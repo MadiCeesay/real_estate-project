@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(generalLimiter);                              // 5. Rate limiting
 
 // ─── Health check ────────────────────────────────────────────────────────────
-app.get('/health', (req, res) => {
+app.get('/', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Real Estate API is running',
