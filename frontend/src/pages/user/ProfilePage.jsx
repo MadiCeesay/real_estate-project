@@ -1,11 +1,15 @@
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../../hooks/useAuth'
+import { useDispatch } from 'react-redux'
+import { authService } from '../../services/auth.service'
+import { updateUserProfile } from '../../redux/slices/authSlice'
 import { FiUser, FiMail, FiPhone, FiSave } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
 export default function ProfilePage() {
   const { user } = useAuth()
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const dispatch = useDispatch()
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
     defaultValues: {
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
@@ -14,8 +18,15 @@ export default function ProfilePage() {
     }
   })
 
-  const onSubmit = (data) => {
-    toast.success('Profile updated successfully!')
+  const onSubmit = async (data) => {
+    try {
+      const { data: response } = await authService.updateMe(data)
+      dispatch(updateUserProfile(response.data.user))
+      toast.success(response.message || 'Profile updated successfully!')
+      reset({ ...data })
+    } catch (err) {
+      toast.error(err.message || 'Unable to update profile. Please try again.')
+    }
   }
 
   return (
@@ -43,7 +54,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-ink-700 dark:text-ink-200 mb-1.5">First name</label>
               <div className="relative">

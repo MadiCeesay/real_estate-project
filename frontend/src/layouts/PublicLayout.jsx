@@ -5,7 +5,7 @@ import ErrorBoundary from '../components/common/ErrorBoundary'
 
 export default function PublicLayout() {
   const { pathname } = useLocation()
-  const isAuthPage = ['/login', '/register', '/forgot-password'].includes(pathname)
+  const isAuthPage = ['/login', '/register', '/forgot-password'].includes(pathname) || pathname.startsWith('/reset-password')
 
   return (
     <>

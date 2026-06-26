@@ -84,7 +84,7 @@ export default function PropertiesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Filters Sidebar */}
         <aside className="lg:col-span-1 space-y-6">
-          <div className="card p-6 sticky top-24">
+          <div className="card p-6 lg:sticky lg:top-24">
             <div className="flex items-center gap-2 mb-6">
               <FiFilter className="text-emerald-600" />
               <h2 className="font-bold text-ink-900 dark:text-white">Filters</h2>

@@ -40,8 +40,8 @@ export default function PropertyDetailPage() {
     <div className="pt-24 pb-20">
       {/* Gallery / Hero */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[300px] md:h-[500px]">
-          <div className="md:col-span-3 rounded-2xl overflow-hidden shadow-card">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[300px] lg:h-[500px]">
+          <div className="lg:col-span-2 rounded-2xl overflow-hidden shadow-card">
             <img
               src={property.images?.[0]?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80'}
               alt={property.title}
@@ -141,7 +141,7 @@ export default function PropertyDetailPage() {
 
         {/* Sidebar Actions */}
         <aside className="space-y-6">
-          <div className="card p-6 sticky top-24">
+          <div className="card p-6 lg:sticky lg:top-24">
             <div className="mb-6">
               <p className="text-sm text-ink-400 font-medium mb-1">Listing Price</p>
               <h3 className="font-display text-3xl font-extrabold text-emerald-700 dark:text-emerald-400">

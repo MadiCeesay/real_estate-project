@@ -70,21 +70,21 @@ export default function Hero() {
             ))}
           </div>
 
-          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-2">
-            <div className="flex-[2] flex items-center gap-2 bg-white/80 dark:bg-ink-800/80 rounded-xl px-4 py-3">
+          <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-2">
+            <div className="flex flex-1 min-w-0 items-center gap-2 bg-white/80 dark:bg-ink-800/80 rounded-xl px-4 py-3">
               <FiMapPin className="text-ink-400 shrink-0" size={16} />
               <input
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="City or neighbourhood..."
-                className="bg-transparent outline-none text-sm w-full placeholder:text-ink-400 text-ink-900 dark:text-white"
+                className="bg-transparent outline-none text-sm w-full min-w-0 placeholder:text-ink-400 text-ink-900 dark:text-white"
               />
             </div>
 
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="flex-1 bg-white/80 dark:bg-ink-800/80 rounded-xl px-4 py-3 text-sm outline-none text-ink-700 dark:text-ink-200"
+              className="flex-1 min-w-0 bg-white/80 dark:bg-ink-800/80 rounded-xl px-4 py-3 text-sm outline-none text-ink-700 dark:text-ink-200"
             >
               <option value="">Any type</option>
               <option value="apartment">Apartment</option>
@@ -98,7 +98,7 @@ export default function Hero() {
             <select
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
-              className="flex-1 bg-white/80 dark:bg-ink-800/80 rounded-xl px-4 py-3 text-sm outline-none text-ink-700 dark:text-ink-200"
+              className="flex-1 min-w-0 bg-white/80 dark:bg-ink-800/80 rounded-xl px-4 py-3 text-sm outline-none text-ink-700 dark:text-ink-200"
             >
               <option value="">Any price</option>
               <option value="0-50000">Under $50k</option>

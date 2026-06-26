@@ -39,7 +39,7 @@ export default function RegisterPage() {
 
         <div className="card p-8">
           {/* Role Switcher */}
-          <div className="flex p-1.5 bg-ink-50 dark:bg-ink-900 rounded-xl mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1.5 bg-ink-50 dark:bg-ink-900 rounded-xl mb-8">
             <button
               onClick={() => setRole(ROLES.BUYER)}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-lg transition-all ${role === ROLES.BUYER ? 'bg-white dark:bg-ink-800 text-emerald-600 shadow-sm' : 'text-ink-400 hover:text-ink-600'}`}

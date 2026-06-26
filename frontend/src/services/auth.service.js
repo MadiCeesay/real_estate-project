@@ -9,6 +9,7 @@ export const authService = {
   login: (payload) => api.post('/auth/login', payload),
   logout: () => api.post('/auth/logout'),
   getMe: () => api.get('/auth/me'),
+  updateMe: (payload) => api.patch('/auth/me', payload),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token, password) => api.post(`/auth/reset-password/${token}`, { password }),
 }

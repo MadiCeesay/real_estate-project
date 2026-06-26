@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Link, useNavigate } from 'react-router-dom'
-import { FiSun, FiMoon, FiMenu, FiX, FiHeart, FiCalendar, FiGrid } from 'react-icons/fi'
+import { FiSun, FiMoon, FiMenu, FiX, FiHeart, FiCalendar, FiGrid, FiUser } from 'react-icons/fi'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
 import { logoutUser } from '../../redux/slices/authSlice'
@@ -55,6 +55,7 @@ export default function Navbar() {
           <NavLink to="/properties" className={navLinkClass}>Browse</NavLink>
           <NavLink to="/about" className={navLinkClass}>About</NavLink>
           <NavLink to="/contact" className={navLinkClass}>Contact</NavLink>
+          {isAuthenticated && <NavLink to="/account" className={navLinkClass}>My Account</NavLink>}
           {isAgent && <NavLink to="/agent/dashboard" className={navLinkClass}>Agent Dashboard</NavLink>}
           {isAdmin && <NavLink to="/admin/dashboard" className={navLinkClass}>Admin</NavLink>}
         </nav>
@@ -110,6 +111,7 @@ export default function Navbar() {
           <NavLink to="/contact" className={navLinkClass} onClick={() => setMobileOpen(false)}>Contact</NavLink>
           {isAuthenticated ? (
             <>
+              <NavLink to="/account" className={navLinkClass} onClick={() => setMobileOpen(false)}>My Account</NavLink>
               <NavLink to="/favorites" className={navLinkClass} onClick={() => setMobileOpen(false)}><FiHeart className="inline mr-2" />Saved</NavLink>
               <NavLink to="/bookings" className={navLinkClass} onClick={() => setMobileOpen(false)}><FiCalendar className="inline mr-2" />Viewings</NavLink>
               {isAgent && <NavLink to="/agent/dashboard" className={navLinkClass} onClick={() => setMobileOpen(false)}><FiGrid className="inline mr-2" />Agent Dashboard</NavLink>}

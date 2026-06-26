@@ -11,20 +11,41 @@ export default function PropertyApprovalPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let active = true
+    setLoading(true)
+
     propertyService.getAll({ status: 'pending' })
-      .then(({ data }) => setProperties(data.data))
-      .catch(() => {})
-      .finally(() => setLoading(false))
+      .then(({ data }) => {
+        if (active) setProperties(data.data)
+      })
+      .catch(() => {
+        if (active) setProperties([])
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => { active = false }
   }, [])
 
-  const handleApprove = (id) => {
-    toast.success('Property approved and published!')
-    setProperties(properties.filter(p => p._id !== id))
+  const handleApprove = async (id) => {
+    try {
+      await propertyService.update(id, { status: 'active' })
+      setProperties((current) => current.filter((p) => p._id !== id))
+      toast.success('Property approved and published!')
+    } catch (err) {
+      toast.error(err.message || 'Failed to approve property.')
+    }
   }
 
-  const handleReject = (id) => {
-    toast.error('Property listing rejected.')
-    setProperties(properties.filter(p => p._id !== id))
+  const handleReject = async (id) => {
+    try {
+      await propertyService.remove(id)
+      setProperties((current) => current.filter((p) => p._id !== id))
+      toast.success('Property rejected and removed.')
+    } catch (err) {
+      toast.error(err.message || 'Failed to reject property.')
+    }
   }
 
   if (loading) return <div className="py-20 flex justify-center"><LoadingSpinner /></div>

@@ -1,30 +1,31 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { FiHeart } from 'react-icons/fi'
-import { propertyService } from '../../services/property.service'
+import { favoriteService } from '../../services/favorite.service'
 import PropertyGrid from '../../components/properties/PropertyGrid'
 
 export default function FavoritesPage() {
-  const favoriteIds = useSelector((state) => state.favorites.ids)
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
+  const favoriteIds = useSelector((state) => state.favorites.ids)
 
   useEffect(() => {
-    if (favoriteIds.length === 0) {
-      setProperties([])
-      setLoading(false)
-      return
-    }
-
+    let active = true
     setLoading(true)
-    propertyService.getAll({ limit: 100 })
+
+    favoriteService.getMine({ limit: 100 })
       .then(({ data }) => {
-        const filtered = data.data.filter(p => favoriteIds.includes(p._id))
-        setProperties(filtered)
+        if (active) setProperties(data.data)
       })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [favoriteIds])
+      .catch(() => {
+        if (active) setProperties([])
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => { active = false }
+  }, [])
 
   return (
     <div className="space-y-8">
