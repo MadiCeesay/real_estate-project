@@ -4,8 +4,14 @@ import { STORAGE_KEYS } from '../constants'
 // ── Centralized Axios instance ────────────────────────────────────────────────
 // Every API call in the app goes through this single instance. This is where
 // the base URL, timeout, and default headers live — change once, applies everywhere.
+const normalizeApiUrl = (rawUrl) => {
+  if (!rawUrl) return '/api/v1'
+  const host = rawUrl.replace(/\/api\/v1\/?$/, '').replace(/\/+$/, '')
+  return `${host}/api/v1`
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://realestate-backend-jauj.onrender.com/api/v1',
+  baseURL: normalizeApiUrl(import.meta.env.VITE_API_URL),
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 })

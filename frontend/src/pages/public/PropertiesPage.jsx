@@ -11,6 +11,23 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
 
+  const cleanParams = (params) => Object.entries(params).reduce((acc, [key, value]) => {
+    if (value === undefined || value === null) return acc
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      if (!trimmed) return acc
+      acc[key] = trimmed
+      return acc
+    }
+    if (Array.isArray(value)) {
+      const filtered = value.filter((item) => item !== undefined && item !== null && item !== '')
+      if (filtered.length) acc[key] = filtered
+      return acc
+    }
+    acc[key] = value
+    return acc
+  }, {})
+
   // Sync state with URL params
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
@@ -25,8 +42,8 @@ export default function PropertiesPage() {
     let active = true
     setLoading(true)
 
-    const params = Object.fromEntries([...searchParams])
-    
+    const params = cleanParams(Object.fromEntries([...searchParams]))
+
     propertyService.getAll(params)
       .then(({ data }) => {
         if (active) {

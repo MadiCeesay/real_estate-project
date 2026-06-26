@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default ({ mode }) => {
   const env = loadEnv(mode, process.cwd())
-  const backendUrl = env.VITE_API_URL ? env.VITE_API_URL.replace(/\/api\/v1\/?$/, '') : 'http://localhost:5000'
+  const backendUrl = env.VITE_API_URL ? env.VITE_API_URL.replace(/\/api\/v1\/?$/, '') : 'https://realestate-backend-jauj.onrender.com'
 
   return defineConfig({
     plugins: [react()],
