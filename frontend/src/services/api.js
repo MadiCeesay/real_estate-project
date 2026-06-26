@@ -5,7 +5,7 @@ import { STORAGE_KEYS } from '../constants'
 // Every API call in the app goes through this single instance. This is where
 // the base URL, timeout, and default headers live — change once, applies everywhere.
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'https://realestate-backend-jauj.onrender.com/api/v1',
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 })
