@@ -140,10 +140,14 @@ export default function RegisterPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Minimum 8 characters"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: { value: 8, message: 'Minimum 8 characters' }
-                  })}
+                  ...register('password', {
+  required: 'Password is required',
+  minLength: { value: 8, message: 'Minimum 8 characters' },
+  pattern: {
+    value: /^(?=.*[A-Z])(?=.*[0-9])/,
+    message: 'Password must contain at least one uppercase letter and one number'
+  }
+})
                   className={`input-field !pl-11 !pr-11 ${errors.password ? 'border-red-500' : ''}`}
                 />
                 <button
