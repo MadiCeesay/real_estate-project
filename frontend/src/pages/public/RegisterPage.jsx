@@ -43,7 +43,6 @@ export default function RegisterPage() {
         </div>
 
         <div className="card p-8">
-          {/* Role Switcher */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1.5 bg-ink-50 dark:bg-ink-900 rounded-xl mb-8">
             <button
               type="button"
@@ -68,7 +67,6 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Name row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-ink-700 dark:text-ink-200 mb-1.5">First name</label>
@@ -95,7 +93,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-ink-700 dark:text-ink-200 mb-1.5">Email address</label>
               <div className="relative">
@@ -113,7 +110,6 @@ export default function RegisterPage() {
               {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
             </div>
 
-            {/* Phone */}
             <div>
               <label className="block text-sm font-semibold text-ink-700 dark:text-ink-200 mb-1.5">
                 Phone number <span className="text-ink-400 font-normal">(optional)</span>
@@ -132,29 +128,27 @@ export default function RegisterPage() {
               {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>}
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-semibold text-ink-700 dark:text-ink-200 mb-1.5">Password</label>
               <div className="relative">
                 <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Minimum 8 characters"
-                  register('password', {
-  required: 'Password is required',
-  minLength: { value: 8, message: 'Minimum 8 characters' },
-  pattern: {
-    value: /^(?=.*[A-Z])(?=.*[0-9])/,
-    message: 'Password must contain at least one uppercase letter and one number'
-  }
-})
+                  placeholder="Min 8 chars, one uppercase, one number"
+                  {...register('password', {
+                    required: 'Password is required',
+                    minLength: { value: 8, message: 'Minimum 8 characters' },
+                    pattern: {
+                      value: /^(?=.*[A-Z])(?=.*[0-9])/,
+                      message: 'Must contain at least one uppercase letter and one number'
+                    }
+                  })}
                   className={`input-field !pl-11 !pr-11 ${errors.password ? 'border-red-500' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </button>
@@ -162,7 +156,6 @@ export default function RegisterPage() {
               {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
             </div>
 
-            {/* Confirm Password */}
             <div>
               <label className="block text-sm font-semibold text-ink-700 dark:text-ink-200 mb-1.5">Confirm password</label>
               <div className="relative">
@@ -180,7 +173,6 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowConfirm((v) => !v)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors"
-                  aria-label={showConfirm ? 'Hide password' : 'Show password'}
                 >
                   {showConfirm ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </button>
