@@ -140,7 +140,7 @@ export default function RegisterPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Minimum 8 characters"
-                  ...register('password', {
+                  register('password', {
   required: 'Password is required',
   minLength: { value: 8, message: 'Minimum 8 characters' },
   pattern: {
