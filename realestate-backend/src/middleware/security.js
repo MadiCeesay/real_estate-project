@@ -12,7 +12,7 @@ export const helmetMiddleware = helmet({
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'res.cloudinary.com', '*.googleapis.com'],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "https://realestate-backend-jauj.onrender.com"],
     },
   },
   crossOriginEmbedderPolicy: false, // Needed for Google Maps embeds
@@ -23,7 +23,7 @@ export const helmetMiddleware = helmet({
 // In production: only FRONTEND_URL is allowed. Any other origin gets blocked.
 const allowedOrigins = [
   config.cors.frontendUrl,
-  'https://euphonious-flan-2cefd1.netlify.app   ',
+  'https://euphonious-flan-2cefd1.netlify.app',
   ...(config.isDev ? ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5508'] : []),
 ];
 
