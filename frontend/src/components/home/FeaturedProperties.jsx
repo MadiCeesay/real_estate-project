@@ -6,9 +6,11 @@ import { MOCK_PROPERTIES } from '../../data/mockProperties'
 import PropertyGrid from '../properties/PropertyGrid'
 import ErrorBoundary from '../common/ErrorBoundary'
 
+// Safely extract a flat array of properties from any API response shape
 const normalizePropertyList = (payload) => {
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.properties)) return payload.properties
+  if (Array.isArray(payload)) return payload.filter(Boolean)
+  if (payload && Array.isArray(payload.properties)) return payload.properties.filter(Boolean)
+  if (payload && Array.isArray(payload.data)) return payload.data.filter(Boolean)
   return []
 }
 
@@ -23,22 +25,26 @@ export default function FeaturedProperties() {
     setError(null)
 
     try {
-      const { data } = await propertyService.getAll({
+      const response = await propertyService.getAll({
         page: 1,
         limit: 6,
         sort: 'most_viewed',
       })
 
-      const fetched = normalizePropertyList(data?.data)
+      // Handle both { data: { data: [...] } } and { data: [...] } shapes
+      const raw = response?.data?.data ?? response?.data ?? null
+      const fetched = normalizePropertyList(raw)
 
       if (fetched.length > 0) {
         setProperties(fetched)
         setUsingFallback(false)
       } else {
+        // Backend is reachable but returned no properties — show mock data
         setProperties(MOCK_PROPERTIES)
         setUsingFallback(true)
       }
     } catch (err) {
+      // Backend unreachable — always show mock data so page isn't blank
       setProperties(MOCK_PROPERTIES)
       setUsingFallback(true)
       setError(err?.message || 'Unable to load featured properties right now.')
@@ -60,16 +66,20 @@ export default function FeaturedProperties() {
             Featured properties
           </h2>
         </div>
-        <Link to="/properties" className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400 hover:gap-2.5 transition-all">
+        <Link
+          to="/properties"
+          className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400 hover:gap-2.5 transition-all"
+        >
           View all <FiArrowRight size={15} />
         </Link>
       </div>
 
+      {/* Error banner — only show when there's an actual error message */}
       {error && usingFallback && (
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-4 py-3">
           <div className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-200">
             <FiAlertCircle className="shrink-0 mt-0.5" size={16} />
-            <span>{error} Showing sample listings until the server is available.</span>
+            <span>Showing sample listings — live properties will appear once the server is connected.</span>
           </div>
           <button
             type="button"
@@ -82,10 +92,17 @@ export default function FeaturedProperties() {
         </div>
       )}
 
+      {/* Soft notice when backend is up but has no properties yet */}
       {usingFallback && !error && !loading && (
-        <p className="mb-6 text-sm text-ink-500 dark:text-ink-400">
-          Sample listings — connect the backend to show live featured properties.
-        </p>
+        <div className="mb-6 flex items-center gap-2 text-sm text-ink-500 dark:text-ink-400 bg-ink-50 dark:bg-ink-800/50 rounded-xl px-4 py-3">
+          <FiAlertCircle size={15} className="shrink-0" />
+          <span>
+            Sample listings below — real properties will appear here once listings go live.{' '}
+            <Link to="/properties" className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+              Browse all properties
+            </Link>
+          </span>
+        </div>
       )}
 
       <ErrorBoundary resetKey={properties.map((p) => p._id).join(',')}>
