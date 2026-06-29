@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-surface text-ink-900 dark:bg-surface-dark dark:text-ink-50 font-body transition-colors duration-300;
+  }
+  ::selection {
+    @apply bg-emerald-200 text-ink-900;
+  }
+}
+
+@layer components {
+  /* Glass surface — used sparingly: floating search bar, modals, dropdowns over imagery */
+  .glass {
+    @apply bg-white/70 dark:bg-ink-800/60 backdrop-blur-lg border border-white/40 dark:border-ink-700/50;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium text-sm
+           hover:bg-emerald-700 active:scale-[0.98] transition-all duration-200 shadow-card disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-ink-800 text-ink-900 dark:text-white font-medium text-sm
+           border border-ink-200 dark:border-ink-700 hover:border-emerald-500 active:scale-[0.98] transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-ink-600 dark:text-ink-300 font-medium text-sm
+           hover:bg-ink-100 dark:hover:bg-ink-800 active:scale-[0.98] transition-all duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700
+           text-sm text-ink-900 dark:text-white placeholder:text-ink-400
+           focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-all duration-150;
+  }
+
+  .card {
+    @apply bg-white dark:bg-ink-800 rounded-2xl border border-ink-100 dark:border-ink-700 shadow-card
+           hover:shadow-card-hover transition-shadow duration-300;
+  }
+
+  /* Skeleton loader shimmer */
+  .skeleton {
+    @apply relative overflow-hidden bg-ink-100 dark:bg-ink-700 rounded-xl;
+    background-image: linear-gradient(
+      90deg,
+      rgba(255,255,255,0) 0,
+      rgba(255,255,255,0.6) 50%,
+      rgba(255,255,255,0) 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 1.8s infinite linear;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+}

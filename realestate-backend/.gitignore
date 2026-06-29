@@ -1,0 +1,35 @@
+# ── Secrets — NEVER commit these ──
+.env
+.env.local
+.env.production
+.env.staging
+
+# ── Dependencies ──
+node_modules/
+
+# ── Logs ──
+logs/
+*.log
+npm-debug.log*
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── Editor ──
+.vscode/
+.idea/
+
+# ── Build ──
+dist/
+build/
+
+# ── Test coverage ──
+coverage/
+
+# ── Uploads (temp local files) ──
+uploads/
+node_modules
+.env
+package-lock.json
+uploads
