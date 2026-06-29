@@ -12,4 +12,5 @@ export const authService = {
   updateMe: (payload) => api.patch('/auth/me', payload),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token, password) => api.post(`/auth/reset-password/${token}`, { password }),
+  changePassword: (payload) => api.post('/auth/change-password', payload),
 }

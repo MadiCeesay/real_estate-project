@@ -14,8 +14,8 @@ const router = Router();
 
 router.post('/',              protect,                          validate(createBookingSchema), createBooking);
 router.get( '/mine',          protect,                          getMyBookings);
-router.get( '/agent',         protect, authorize('agent'),      getAgentBookings);
-router.patch('/:id/status',   protect, authorize('agent'),      validate(updateBookingStatusSchema), updateBookingStatus);
+router.get( '/agent',         protect, authorize('agent', 'admin'), getAgentBookings);
+router.patch('/:id/status',   protect, authorize('agent', 'admin'), validate(updateBookingStatusSchema), updateBookingStatus);
 router.delete('/:id',         protect,                          cancelBooking);
 
 export default router;

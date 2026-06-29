@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiUsers, FiHome, FiDollarSign, FiBarChart2, FiCheckSquare, FiCalendar, FiClock, FiMapPin } from 'react-icons/fi'
-import { bookingService } from '../../services/booking.service'
-import api from '../../services/api'
+import { FiUsers, FiHome, FiCheckSquare, FiCalendar, FiClock, FiMapPin } from 'react-icons/fi'
+import { adminService } from '../../services/admin.service'
+import { formatViewingTime } from '../../utils/time'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
 
 const getStatusColor = (status) => {
@@ -21,17 +21,12 @@ export default function AdminDashboardPage() {
   const [loadingBookings, setLoadingBookings] = useState(true)
 
   useEffect(() => {
-    // Load recent bookings (admin sees all via agent endpoint fallback)
-    bookingService.getAgentBookings({ page: 1, limit: 5 })
-      .then(({ data }) => {
-        const list = data?.data ?? []
-        setRecentBookings(list)
-      })
+    adminService.getBookings({ page: 1, limit: 5 })
+      .then(({ data }) => setRecentBookings(data?.data ?? []))
       .catch(() => {})
       .finally(() => setLoadingBookings(false))
 
-    // Load platform stats if endpoint exists
-    api.get('/admin/stats').then(({ data }) => {
+    adminService.getStats().then(({ data }) => {
       const s = data?.data ?? {}
       setStats({
         users: s.totalUsers?.toLocaleString() ?? '—',
@@ -56,7 +51,6 @@ export default function AdminDashboardPage() {
         <p className="text-ink-500 dark:text-ink-400 mt-1">Overview of platform growth and activity.</p>
       </div>
 
-      {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat) => (
           <div key={stat.label} className="card p-6">
@@ -70,11 +64,10 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Bookings */}
         <div className="card p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-bold text-ink-900 dark:text-white">Recent Booking Requests</h3>
-            <Link to="/dashboard/admin/bookings" className="text-xs font-semibold text-emerald-600 hover:underline">
+            <Link to="/admin/bookings" className="text-xs font-semibold text-emerald-600 hover:underline">
               View all
             </Link>
           </div>
@@ -89,7 +82,6 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               {recentBookings.map((booking) => (
                 <div key={booking._id} className="flex flex-col sm:flex-row sm:items-center gap-4 py-4 border-b border-ink-100 dark:border-ink-800 last:border-0">
-                  {/* Property Image */}
                   <div className="w-full sm:w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-ink-100 dark:bg-ink-800">
                     <img
                       src={booking.property?.images?.[0]?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=200&q=60'}
@@ -98,7 +90,6 @@ export default function AdminDashboardPage() {
                     />
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="font-bold text-sm text-ink-900 dark:text-white truncate">
@@ -114,11 +105,10 @@ export default function AdminDashboardPage() {
                     </p>
                     <div className="flex gap-3 text-xs text-ink-500">
                       <span className="flex items-center gap-1"><FiCalendar size={11} /> {new Date(booking.viewingDate).toLocaleDateString()}</span>
-                      <span className="flex items-center gap-1"><FiClock size={11} /> {booking.viewingTime}</span>
+                      <span className="flex items-center gap-1"><FiClock size={11} /> {formatViewingTime(booking.viewingTime)}</span>
                     </div>
                   </div>
 
-                  {/* Buyer */}
                   <div className="text-xs text-ink-500 dark:text-ink-400 shrink-0">
                     <p className="font-semibold text-ink-700 dark:text-ink-200">
                       {booking.buyer?.firstName} {booking.buyer?.lastName}

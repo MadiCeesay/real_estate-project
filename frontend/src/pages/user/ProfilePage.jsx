@@ -15,12 +15,19 @@ export default function ProfilePage() {
       lastName: user?.lastName || '',
       email: user?.email || '',
       phone: user?.phone || '',
+      avatar: user?.avatar || '',
     }
   })
 
   const onSubmit = async (data) => {
     try {
-      const { data: response } = await authService.updateMe(data)
+      const payload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        ...(data.avatar ? { avatar: data.avatar } : {}),
+      }
+      const { data: response } = await authService.updateMe(payload)
       dispatch(updateUserProfile(response.data.user))
       toast.success(response.message || 'Profile updated successfully!')
       reset({ ...data })
@@ -43,14 +50,22 @@ export default function ProfilePage() {
       <div className="card p-8">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex items-center gap-6 mb-8">
-            <div className="w-20 h-20 rounded-full bg-emerald-600 text-white flex items-center justify-center text-2xl font-bold">
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+            <div className="w-20 h-20 rounded-full bg-emerald-600 text-white flex items-center justify-center text-2xl font-bold overflow-hidden">
+              {user?.avatar ? (
+                <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
+              )}
             </div>
-            <div>
-              <button type="button" className="text-sm font-bold text-emerald-600 hover:text-emerald-700">
-                Change avatar
-              </button>
-              <p className="text-xs text-ink-400 mt-1">JPG, GIF or PNG. Max size 2MB.</p>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-ink-700 dark:text-ink-200 mb-1.5">Avatar URL</label>
+              <input
+                type="url"
+                placeholder="https://example.com/photo.jpg"
+                {...register('avatar')}
+                className="input-field"
+              />
+              <p className="text-xs text-ink-400 mt-1">Paste a direct link to your profile photo.</p>
             </div>
           </div>
 

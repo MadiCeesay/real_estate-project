@@ -106,6 +106,23 @@ export const sendBookingStatusUpdate = async (booking) => {
   });
 };
 
+// ── Contact form email ────────────────────────────────────────────────────────
+export const sendContactEmail = async ({ firstName, lastName, email, message }) => {
+  const body = `
+    <h2>New Contact Message</h2>
+    <div class="detail-row"><span class="detail-label">From:</span> ${firstName} ${lastName}</div>
+    <div class="detail-row"><span class="detail-label">Email:</span> ${email}</div>
+    <p style="margin-top:16px">${message.replace(/\n/g, '<br>')}</p>
+  `;
+
+  await send({
+    to: config.email.from,
+    subject: `Contact form: ${firstName} ${lastName}`,
+    html: htmlTemplate('Contact Message', body),
+    replyTo: email,
+  });
+};
+
 // ── Password reset email ──────────────────────────────────────────────────────
 export const sendPasswordReset = async (user, token) => {
   const resetUrl = `${config.cors.frontendUrl}/reset-password/${token}`;

@@ -31,9 +31,11 @@ import SettingsPage from './pages/user/SettingsPage'
 import AgentDashboardPage from './pages/agent/AgentDashboardPage'
 import AgentListingsPage from './pages/agent/AgentListingsPage'
 import AgentBookingsPage from './pages/agent/AgentBookingsPage'
+import PropertyFormPage from './pages/agent/PropertyFormPage'
 
 // Admin dashboard
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
+import AdminBookingsPage from './pages/admin/AdminBookingsPage'
 import ManageUsersPage from './pages/admin/ManageUsersPage'
 import ManagePropertiesPage from './pages/admin/ManagePropertiesPage'
 import PropertyApprovalPage from './pages/admin/PropertyApprovalPage'
@@ -57,6 +59,7 @@ const adminLinks = [
   { to: '/admin/users', label: 'Manage Users', icon: FiUsers },
   { to: '/admin/properties', label: 'Manage Properties', icon: FiHome },
   { to: '/admin/approvals', label: 'Property Approval', icon: FiCheckSquare },
+  { to: '/admin/bookings', label: 'All Bookings', icon: FiCalendar },
 ]
 
 export default function App() {
@@ -104,6 +107,8 @@ export default function App() {
           <Route path="agent" element={<DashboardLayout links={agentLinks} title="Agent Dashboard" />}>
             <Route path="dashboard" element={<AgentDashboardPage />} />
             <Route path="listings" element={<AgentListingsPage />} />
+            <Route path="listings/new" element={<PropertyFormPage />} />
+            <Route path="listings/:id/edit" element={<PropertyFormPage />} />
             <Route path="bookings" element={<AgentBookingsPage />} />
           </Route>
         </Route>
@@ -112,6 +117,7 @@ export default function App() {
         <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
           <Route path="admin" element={<DashboardLayout links={adminLinks} title="Admin" />}>
             <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="bookings" element={<AdminBookingsPage />} />
             <Route path="users" element={<ManageUsersPage />} />
             <Route path="properties" element={<ManagePropertiesPage />} />
             <Route path="approvals" element={<PropertyApprovalPage />} />

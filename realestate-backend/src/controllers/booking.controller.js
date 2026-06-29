@@ -72,7 +72,7 @@ export const getMyBookings = asyncHandler(async (req, res) => {
 // GET /api/v1/bookings/agent
 export const getAgentBookings = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, status } = req.query;
-  const filter = { agent: req.user._id };
+  const filter = req.user.role === 'admin' ? {} : { agent: req.user._id };
   if (status) filter.status = status;
 
   const skip = (Number(page) - 1) * Number(limit);
@@ -99,7 +99,8 @@ export const updateBookingStatus = asyncHandler(async (req, res) => {
     .populate('agent', 'firstName lastName email');
 
   if (!booking) throw new AppError('Booking not found', 404);
-  if (booking.agent._id.toString() !== req.user._id.toString()) {
+  const isOwner = booking.agent._id.toString() === req.user._id.toString();
+  if (!isOwner && req.user.role !== 'admin') {
     throw new AppError('You can only update bookings for your properties', 403);
   }
   if (booking.status === 'cancelled') {

@@ -9,6 +9,7 @@ import {
   refreshSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  changePasswordSchema,
 } from '../validators/auth.js';
 import {
   register,
@@ -19,6 +20,7 @@ import {
   updateMe,
   forgotPassword,
   resetPassword,
+  changePassword,
 } from '../controllers/auth.controller.js';
 
 const router = Router();
@@ -36,5 +38,6 @@ router.patch('/me',      protect,                               validate(z.objec
 })), updateMe);
 router.post('/forgot-password', authLimiter, validate(forgotPasswordSchema), forgotPassword);
 router.post('/reset-password/:token', validate(resetPasswordSchema), resetPassword);
+router.post('/change-password', protect, validate(changePasswordSchema), changePassword);
 
 export default router;

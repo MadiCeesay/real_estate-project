@@ -118,10 +118,15 @@ export const getPropertyById = asyncHandler(async (req, res) => {
 
 // POST /api/v1/properties
 export const createProperty = asyncHandler(async (req, res) => {
-  const { coordinates, ...rest } = req.body;
+  const { coordinates, status, ...rest } = req.body;
+
+  const propertyStatus = req.user.role === 'admin'
+    ? (status || 'active')
+    : 'pending';
 
   const property = await Property.create({
     ...rest,
+    status: propertyStatus,
     agent: req.user._id,
     location: {
       type: 'Point',
@@ -129,7 +134,11 @@ export const createProperty = asyncHandler(async (req, res) => {
     },
   });
 
-  sendCreated(res, { property }, 'Property listed successfully');
+  const message = propertyStatus === 'pending'
+    ? 'Property submitted for approval'
+    : 'Property listed successfully';
+
+  sendCreated(res, { property }, message);
 });
 
 // PUT /api/v1/properties/:id

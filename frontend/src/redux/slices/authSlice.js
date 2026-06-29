@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { authService } from '../../services/auth.service'
 import { STORAGE_KEYS } from '../../constants'
-
-// ── Async thunks — each wraps one auth API call with loading/error handling ──
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -33,7 +31,19 @@ export const logoutUser = createAsyncThunk('auth/logout', async () => {
   try { await authService.logout() } catch { /* logout locally regardless */ }
 })
 
-// ── Restore session from localStorage on app load ────────────────────────────
+export const validateSession = createAsyncThunk(
+  'auth/validateSession',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await authService.getMe()
+      return data.data.user
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Session expired')
+    }
+  }
+)
+
+// ── Async thunks — each wraps one auth API call with loading/error handling ──
 const storedUser = (() => {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.USER)) } catch { return null }
 })()
@@ -95,6 +105,17 @@ const authSlice = createSlice({
       })
       // Logout
       .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null
+        state.isAuthenticated = false
+        clearSession()
+      })
+      // Validate session
+      .addCase(validateSession.fulfilled, (state, action) => {
+        state.user = action.payload
+        state.isAuthenticated = true
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(action.payload))
+      })
+      .addCase(validateSession.rejected, (state) => {
         state.user = null
         state.isAuthenticated = false
         clearSession()

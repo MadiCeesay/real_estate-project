@@ -1,26 +1,49 @@
 import { useState, useEffect } from 'react'
-import { FiCalendar, FiClock, FiMapPin, FiExternalLink } from 'react-icons/fi'
+import { FiCalendar, FiClock, FiMapPin, FiExternalLink, FiX } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 import { bookingService } from '../../services/booking.service'
+import { formatViewingTime } from '../../utils/time'
 import EmptyState from '../../components/common/EmptyState'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
+import toast from 'react-hot-toast'
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
+  const [cancellingId, setCancellingId] = useState(null)
 
-  useEffect(() => {
+  const loadBookings = () => {
+    setLoading(true)
     bookingService.getMine()
-      .then(({ data }) => setBookings(data.data))
-      .catch(() => {})
+      .then(({ data }) => setBookings(data.data || []))
+      .catch(() => setBookings([]))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { loadBookings() }, [])
+
+  const handleCancel = async (id) => {
+    if (!window.confirm('Cancel this viewing request?')) return
+    setCancellingId(id)
+    try {
+      await bookingService.cancel(id)
+      setBookings((current) => current.map((b) => (
+        b._id === id ? { ...b, status: 'cancelled' } : b
+      )))
+      toast.success('Booking cancelled')
+    } catch (err) {
+      toast.error(err?.message || 'Failed to cancel booking')
+    } finally {
+      setCancellingId(null)
+    }
+  }
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'confirmed': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
       case 'pending':   return 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'
       case 'cancelled': return 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'
+      case 'completed': return 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400'
       default:          return 'bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-400'
     }
   }
@@ -50,13 +73,13 @@ export default function BookingsPage() {
           {bookings.map((booking) => (
             <div key={booking._id} className="card p-5 flex flex-col md:flex-row gap-6 items-start md:items-center">
               <div className="w-full md:w-32 h-24 rounded-xl overflow-hidden flex-shrink-0">
-                <img 
-                  src={booking.property?.images?.[0]?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=60'} 
-                  alt="" 
+                <img
+                  src={booking.property?.images?.[0]?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=60'}
+                  alt=""
                   className="w-full h-full object-cover"
                 />
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1">
                   <h3 className="font-bold text-ink-900 dark:text-white truncate">
@@ -71,8 +94,14 @@ export default function BookingsPage() {
                   {booking.property?.address?.city}, {booking.property?.address?.state}
                 </p>
                 <div className="flex flex-wrap gap-4 text-xs font-medium text-ink-600 dark:text-ink-300">
-                  <span className="flex items-center gap-1.5"><FiCalendar className="text-emerald-600" /> {new Date(booking.date).toLocaleDateString()}</span>
-                  <span className="flex items-center gap-1.5"><FiClock className="text-emerald-600" /> {booking.timeSlot}</span>
+                  <span className="flex items-center gap-1.5">
+                    <FiCalendar className="text-emerald-600" />
+                    {new Date(booking.viewingDate).toLocaleDateString()}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <FiClock className="text-emerald-600" />
+                    {formatViewingTime(booking.viewingTime)}
+                  </span>
                 </div>
               </div>
 
@@ -80,6 +109,16 @@ export default function BookingsPage() {
                 <Link to={`/properties/${booking.property?._id}`} className="btn-secondary !py-2 !px-4 text-xs flex-1 md:flex-none">
                   <FiExternalLink className="mr-1.5" /> View Listing
                 </Link>
+                {['pending', 'confirmed'].includes(booking.status) && (
+                  <button
+                    onClick={() => handleCancel(booking._id)}
+                    disabled={cancellingId === booking._id}
+                    className="btn-secondary !py-2 !px-4 text-xs text-red-600 flex-1 md:flex-none"
+                  >
+                    <FiX className="mr-1.5" />
+                    {cancellingId === booking._id ? 'Cancelling...' : 'Cancel'}
+                  </button>
+                )}
               </div>
             </div>
           ))}

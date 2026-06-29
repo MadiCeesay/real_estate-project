@@ -10,7 +10,7 @@ export const fetchFavoriteIds = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await favoriteService.getMine({ limit: 100 })
-      return data.data.map((p) => p._id)
+      return data.data.filter((p) => p?._id).map((p) => p._id)
     } catch (err) {
       return rejectWithValue(err.message)
     }

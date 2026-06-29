@@ -11,12 +11,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toggleFavorite } from '../../redux/slices/favoritesSlice'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
 import toast from 'react-hot-toast'
-
-const TIME_SLOTS = [
-  '09:00 AM', '10:00 AM', '11:00 AM',
-  '12:00 PM', '01:00 PM', '02:00 PM',
-  '03:00 PM', '04:00 PM', '05:00 PM',
-]
+import { VIEWING_TIME_SLOTS } from '../../utils/time'
 
 const formatPrice = (price, type) => {
   const safePrice = Number(price)
@@ -209,6 +204,32 @@ export default function PropertyDetailPage() {
               </div>
             </div>
           )}
+
+          {property.location?.coordinates?.length === 2 && (
+            <div>
+              <h2 className="font-display text-xl font-bold text-ink-900 dark:text-white mb-4">Location</h2>
+              <div className="rounded-2xl overflow-hidden h-64 bg-ink-100 dark:bg-ink-800">
+                {import.meta.env.VITE_GOOGLE_MAPS_KEY ? (
+                  <iframe
+                    title="Property location"
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY}&q=${property.location.coordinates[1]},${property.location.coordinates[0]}`}
+                  />
+                ) : (
+                  <a
+                    href={`https://www.google.com/maps?q=${property.location.coordinates[1]},${property.location.coordinates[0]}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center h-full text-emerald-600 font-semibold"
+                  >
+                    View on Google Maps
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -289,7 +310,7 @@ export default function PropertyDetailPage() {
                 </p>
                 <div className="flex gap-3">
                   <button onClick={() => setShowBookingModal(false)} className="btn-secondary flex-1">Close</button>
-                  <Link to="/dashboard/bookings" className="btn-primary flex-1 text-center">My Bookings</Link>
+                  <Link to="/bookings" className="btn-primary flex-1 text-center">My Bookings</Link>
                 </div>
               </div>
             ) : (
@@ -324,8 +345,8 @@ export default function PropertyDetailPage() {
                       className={`input-field ${errors.viewingTime ? 'border-red-500' : ''}`}
                     >
                       <option value="">Select a time slot</option>
-                      {TIME_SLOTS.map((slot) => (
-                        <option key={slot} value={slot}>{slot}</option>
+                      {VIEWING_TIME_SLOTS.map((slot) => (
+                        <option key={slot.value} value={slot.value}>{slot.label}</option>
                       ))}
                     </select>
                     {errors.viewingTime && <p className="text-xs text-red-500 mt-1">{errors.viewingTime.message}</p>}

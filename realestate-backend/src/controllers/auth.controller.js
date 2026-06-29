@@ -186,3 +186,20 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   sendSuccess(res, null, 'Password reset successful. Please log in again.');
 });
+
+// POST /api/v1/auth/change-password
+export const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await User.findById(req.user._id).select('+password');
+  if (!user) throw new AppError('User not found', 404);
+
+  const isMatch = await user.comparePassword(currentPassword);
+  if (!isMatch) throw new AppError('Current password is incorrect', 401);
+
+  user.password = newPassword;
+  user.refreshToken = undefined;
+  await user.save();
+
+  sendSuccess(res, null, 'Password changed successfully. Please log in again.');
+});
