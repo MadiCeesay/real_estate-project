@@ -12,7 +12,7 @@ export const helmetMiddleware = helmet({
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'res.cloudinary.com', '*.googleapis.com'],
-      connectSrc: ["'self'", "https://realestate-backend-jauj.onrender.com"],
+      connectSrc: ["'self'", "https://real-estate-project-dof5.onrender.com"],
     },
   },
   crossOriginEmbedderPolicy: false, // Needed for Google Maps embeds
