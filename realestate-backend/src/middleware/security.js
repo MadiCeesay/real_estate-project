@@ -23,8 +23,7 @@ export const helmetMiddleware = helmet({
 // In production: only FRONTEND_URL is allowed. Any other origin gets blocked.
 const allowedOrigins = [
   config.cors.frontendUrl,
-  'https://euphonious-flan-2cefd1.netlify.app',
-  'https://amc-real-estate-project.netlify.app',
+  'https://amcreal-estate-project.vercel.app',
   ...(config.isDev ? ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5508'] : []),
 ];
 
