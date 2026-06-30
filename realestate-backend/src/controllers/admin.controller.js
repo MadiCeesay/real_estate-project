@@ -107,3 +107,40 @@ export const getAllBookings = asyncHandler(async (req, res) => {
 
   sendPaginated(res, bookings, { page: Number(page), limit: Number(limit), total });
 });
+// DELETE /api/v1/admin/properties/:id
+export const deleteProperty = asyncHandler(async (req, res) => {
+  const property = await Property.findById(req.params.id);
+  if (!property) throw new AppError('Property not found', 404);
+  await property.deleteOne();
+  sendSuccess(res, null, 'Property deleted successfully');
+});
+
+// PATCH /api/v1/admin/properties/:id/status
+export const updatePropertyStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+  if (!['active', 'pending', 'sold', 'rented'].includes(status)) {
+    throw new AppError('Invalid status', 400);
+  }
+  const property = await Property.findByIdAndUpdate(
+    req.params.id,
+    { status },
+    { new: true }
+  );
+  if (!property) throw new AppError('Property not found', 404);
+  sendSuccess(res, { property }, 'Property status updated');
+});
+
+// PATCH /api/v1/admin/bookings/:id/status
+export const updateBookingStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+  if (!['pending', 'confirmed', 'completed', 'cancelled'].includes(status)) {
+    throw new AppError('Invalid status', 400);
+  }
+  const booking = await Booking.findByIdAndUpdate(
+    req.params.id,
+    { status },
+    { new: true }
+  ).populate('property', 'title address').populate('buyer', 'firstName lastName email');
+  if (!booking) throw new AppError('Booking not found', 404);
+  sendSuccess(res, { booking }, 'Booking status updated');
+});

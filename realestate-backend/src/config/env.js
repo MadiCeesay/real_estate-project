@@ -13,14 +13,11 @@ const REQUIRED_VARS = [
   'CLOUDINARY_CLOUD_NAME',
   'CLOUDINARY_API_KEY',
   'CLOUDINARY_API_SECRET',
-  'GOOGLE_MAPS_API_KEY',
-  'ANTHROPIC_API_KEY',
   'EMAIL_HOST',
   'EMAIL_USER',
   'EMAIL_PASS',
   'FRONTEND_URL',
 ];
-
 const missing = REQUIRED_VARS.filter((key) => !process.env[key]);
 
 if (missing.length > 0) {

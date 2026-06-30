@@ -4,6 +4,7 @@ import { adminService } from '../../services/admin.service'
 import { formatViewingTime } from '../../utils/time'
 import EmptyState from '../../components/common/EmptyState'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
+import toast from 'react-hot-toast'
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState([])
@@ -20,6 +21,16 @@ export default function AdminBookingsPage() {
       .finally(() => setLoading(false))
   }, [filter])
 
+  const handleStatusChange = async (id, status) => {
+    try {
+      await adminService.updateBookingStatus(id, status)
+      toast.success(`Booking ${status}`)
+      setBookings(prev => prev.map(b => b._id === id ? { ...b, status } : b))
+    } catch {
+      toast.error('Failed to update booking')
+    }
+  }
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'confirmed': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
@@ -35,7 +46,7 @@ export default function AdminBookingsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-display font-extrabold text-ink-900 dark:text-white">All Bookings</h1>
-          <p className="text-ink-500 dark:text-ink-400 mt-1">Platform-wide viewing requests.</p>
+          <p className="text-ink-500 dark:text-ink-400 mt-1">Manage all platform viewing requests.</p>
         </div>
         <select value={filter} onChange={(e) => setFilter(e.target.value)} className="input-field !py-2.5 w-full md:w-48">
           <option value="">All statuses</option>
@@ -61,23 +72,64 @@ export default function AdminBookingsPage() {
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-ink-400">Agent</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-ink-400">Schedule</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-ink-400">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-ink-400 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink-100 dark:divide-ink-800">
                 {bookings.map((booking) => (
-                  <tr key={booking._id}>
+                  <tr key={booking._id} className="hover:bg-ink-50/50 dark:hover:bg-ink-900/20 transition-colors">
                     <td className="px-6 py-4">
                       <p className="text-sm font-bold text-ink-900 dark:text-white">{booking.property?.title}</p>
-                      <p className="text-xs text-ink-500 flex items-center gap-1"><FiMapPin size={10} /> {booking.property?.address?.city}</p>
+                      <p className="text-xs text-ink-500 flex items-center gap-1 mt-0.5">
+                        <FiMapPin size={10} /> {booking.property?.address?.city}
+                      </p>
                     </td>
-                    <td className="px-6 py-4 text-sm">{booking.buyer?.firstName} {booking.buyer?.lastName}</td>
-                    <td className="px-6 py-4 text-sm">{booking.agent?.firstName} {booking.agent?.lastName}</td>
+                    <td className="px-6 py-4 text-sm text-ink-700 dark:text-ink-300">
+                      {booking.buyer?.firstName} {booking.buyer?.lastName}
+                      <p className="text-xs text-ink-400">{booking.buyer?.email}</p>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-ink-700 dark:text-ink-300">
+                      {booking.agent?.firstName} {booking.agent?.lastName}
+                    </td>
                     <td className="px-6 py-4 text-xs text-ink-500">
                       <span className="flex items-center gap-1"><FiCalendar size={11} /> {new Date(booking.viewingDate).toLocaleDateString()}</span>
                       <span className="flex items-center gap-1 mt-1"><FiClock size={11} /> {formatViewingTime(booking.viewingTime)}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(booking.status)}`}>{booking.status}</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(booking.status)}`}>
+                        {booking.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        {booking.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handleStatusChange(booking._id, 'confirmed')}
+                              className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors"
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              onClick={() => handleStatusChange(booking._id, 'cancelled')}
+                              className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        )}
+                        {booking.status === 'confirmed' && (
+                          <button
+                            onClick={() => handleStatusChange(booking._id, 'completed')}
+                            className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                          >
+                            Complete
+                          </button>
+                        )}
+                        {(booking.status === 'cancelled' || booking.status === 'completed') && (
+                          <span className="text-xs text-ink-400 italic">No actions</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

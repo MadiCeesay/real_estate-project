@@ -24,8 +24,10 @@ export const helmetMiddleware = helmet({
 const allowedOrigins = [
   config.cors.frontendUrl,
   'https://euphonious-flan-2cefd1.netlify.app',
+  'https://amc-real-estate-project.netlify.app',
   ...(config.isDev ? ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5508'] : []),
 ];
+
 
 export const corsMiddleware = cors({
   origin: (origin, callback) => {

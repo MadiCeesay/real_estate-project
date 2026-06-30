@@ -72,58 +72,59 @@ export default function App() {
       }} />
       <ErrorBoundary resetKey={pathname}>
         <Routes>
-        {/* ── Public routes ────────────────────────────────────────────── */}
-        <Route element={<PublicLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="properties" element={<PropertiesPage />} />
-          <Route path="properties/:id" element={<PropertyDetailPage />} />
-          <Route path="about" element={<AboutPage />} />
-          <Route path="contact" element={<ContactPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="reset-password/:token" element={<ResetPasswordPage />} />
 
-          {/* Logged-in user (any role) — favorites/bookings live at top level too for navbar links */}
+          {/* ── Public routes ─────────────────────────────────────────── */}
+          <Route element={<PublicLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="properties" element={<PropertiesPage />} />
+            <Route path="properties/:id" element={<PropertyDetailPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="contact" element={<ContactPage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="reset-password/:token" element={<ResetPasswordPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="favorites" element={<FavoritesPage />} />
+              <Route path="bookings" element={<BookingsPage />} />
+            </Route>
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+
+          {/* ── User account dashboard ────────────────────────────────── */}
           <Route element={<ProtectedRoute />}>
-            <Route path="favorites" element={<FavoritesPage />} />
-            <Route path="bookings" element={<BookingsPage />} />
+            <Route path="account" element={<DashboardLayout links={userLinks} title="My Account" />}>
+              <Route index element={<UserDashboardPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
           </Route>
 
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-
-        {/* ── User account dashboard ──────────────────────────────────── */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="account" element={<DashboardLayout links={userLinks} title="My Account" />}>
-            <Route index element={<UserDashboardPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="settings" element={<SettingsPage />} />
+          {/* ── Agent dashboard ───────────────────────────────────────── */}
+          <Route element={<ProtectedRoute roles={[ROLES.AGENT, ROLES.ADMIN]} />}>
+            <Route path="agent" element={<DashboardLayout links={agentLinks} title="Agent Dashboard" />}>
+              <Route path="dashboard" element={<AgentDashboardPage />} />
+              <Route path="listings" element={<AgentListingsPage />} />
+              <Route path="listings/new" element={<PropertyFormPage />} />
+              <Route path="listings/:id/edit" element={<PropertyFormPage />} />
+              <Route path="bookings" element={<AgentBookingsPage />} />
+            </Route>
           </Route>
-        </Route>
 
-        {/* ── Agent dashboard ──────────────────────────────────────────── */}
-        <Route element={<ProtectedRoute roles={[ROLES.AGENT, ROLES.ADMIN]} />}>
-          <Route path="agent" element={<DashboardLayout links={agentLinks} title="Agent Dashboard" />}>
-            <Route path="dashboard" element={<AgentDashboardPage />} />
-            <Route path="listings" element={<AgentListingsPage />} />
-            <Route path="listings/new" element={<PropertyFormPage />} />
-            <Route path="listings/:id/edit" element={<PropertyFormPage />} />
-            <Route path="bookings" element={<AgentBookingsPage />} />
+          {/* ── Admin dashboard ───────────────────────────────────────── */}
+          <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
+            <Route path="admin" element={<DashboardLayout links={adminLinks} title="Admin" />}>
+              <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="users" element={<ManageUsersPage />} />
+              <Route path="properties" element={<ManagePropertiesPage />} />
+              <Route path="properties/new" element={<PropertyFormPage />} />
+              <Route path="properties/:id/edit" element={<PropertyFormPage />} />
+              <Route path="approvals" element={<PropertyApprovalPage />} />
+              <Route path="bookings" element={<AdminBookingsPage />} />
+            </Route>
           </Route>
-        </Route>
 
-        {/* ── Admin dashboard ──────────────────────────────────────────── */}
-        <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
-          <Route path="admin" element={<DashboardLayout links={adminLinks} title="Admin" />}>
-            <Route path="dashboard" element={<AdminDashboardPage />} />
-            <Route path="bookings" element={<AdminBookingsPage />} />
-            <Route path="users" element={<ManageUsersPage />} />
-            <Route path="properties" element={<ManagePropertiesPage />} />
-            <Route path="approvals" element={<PropertyApprovalPage />} />
-          </Route>
-        </Route>
-      </Routes>
+        </Routes>
       </ErrorBoundary>
     </>
   )

@@ -7,10 +7,12 @@ import {
   getUsers,
   updateUser,
   getAllBookings,
+  deleteProperty,
+  updatePropertyStatus,
+  updateBookingStatus,
 } from '../controllers/admin.controller.js';
 
 const router = Router();
-
 router.use(protect, authorize('admin'));
 
 router.get('/stats', getStats);
@@ -19,6 +21,11 @@ router.patch('/users/:id', validate(z.object({
   role: z.enum(['buyer', 'agent', 'admin']).optional(),
   isActive: z.boolean().optional(),
 })), updateUser);
+
 router.get('/bookings', getAllBookings);
+router.patch('/bookings/:id/status', updateBookingStatus);
+
+router.delete('/properties/:id', deleteProperty);
+router.patch('/properties/:id/status', updatePropertyStatus);
 
 export default router;
